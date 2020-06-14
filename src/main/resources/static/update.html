@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>注册</title>
+    <link rel="stylesheet" href="bt/css/bootstrap.min.css">
+    <link rel="stylesheet" href="bt/css/bootstrap-theme.min.css">
+    <script type="text/javascript" src="bt/js/jquery.js"></script>
+    <script type="text/javascript" src="bt/js/bootstrap.min.js"></script>
+</head>
+<body>
+<div class="container">
+    <form>
+        <div class="form-group">
+            <label for="exampleInputEmail1">username</label>
+            <input type="email" class="form-control" id="exampleInputEmail1" placeholder="Email">
+        </div>
+        <div class="form-group">
+            <label for="exampleInputPassword1">password</label>
+            <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
+        </div>
+        <div class="form-group">
+            <label for="exampleInputPassword2">repassword</label>
+            <input type="password" class="form-control" id="exampleInputPassword2" placeholder="Password">
+        </div>
+        <input id="sub" class="btn btn-success form-control" type="button" value="Submit">
+    </form>
+</div>
+</body>
+</html>
+
+<script type="text/javascript">
+
+    $(function () {
+        var id = GetQueryString("id")
+        $.post({
+            url:'user/getUserById?id=' + id,
+            success:function (data) {
+                console.log(data)
+
+                $("#id").val(id);
+                $("#exampleInputEmail1").val(data.username);
+                $("#exampleInputPassword1").val(data.password);
+                $("#exampleInputPassword2").val(data.password);
+
+            }
+        })
+
+    });
+
+    function GetQueryString(name)
+    {
+
+        var reg = new RegExp("(^|$)"+ name +"=([^&]*)(&|$)");
+        var r = window.location.search.substr(1).match(reg);
+        if(r!=null)return unescape(r[2]); return null;
+
+    }
+
+    $("#sub").click(function () {
+        var id = $("#id").val(id);
+        var userName = $("#exampleInputEmail1").val();
+        var passWord = $("#exampleInputPassword1").val();
+        var rePassWord = $("#exampleInputPassword2").val();
+
+        //校验用户名是否为空
+        if(userName.length ==   0){
+            alert("用户名不能为空");
+            return;//return的作用不让程序继续向下执行
+        }
+        //校验密码是否为空
+        if(passWord.length==0){
+            alert("密码不能为空")
+            return;//return的作用不让程序继续向下执行
+        }
+        //判断密码是否和重复密码一致
+        if(passWord != rePassWord){
+            alert("两次密码不一致")
+            return;//return的作用不让程序继续向下执行
+        }
+        //封装数据，并提交给后端接口
+        var user = {
+            "id" : id,
+            "username" : userName,
+            "password" : passWord
+        }
+
+        //将实体类转化为JSON
+        var userJson = JSON.stringify(user)
+
+        //提交给后端接口
+        $.post({
+            url:'user/updateUserById',
+            data:userJson,
+            contentType:'application/json',
+            success:function (data) {
+                alert(data)
+            }
+        })
+    })
+</script>
